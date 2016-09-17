@@ -59,7 +59,8 @@ public class SuccessKilled {
 
 	@Override
 	public String toString() {
-		return "SuccessKilled [seckillId=" + seckillId + ", userPhone=" + userPhone + ", state=" + state + "]";
+		return "SuccessKilled [seckillId=" + seckillId + ", userPhone=" + userPhone + ", state=" + state
+				+ ", createTime=" + createTime + ", seckill=" + seckill + "]";
 	}
 
 }
