@@ -50,9 +50,4 @@
 		<property name="basePackage" value="com.seckill.dao" />
 	</bean>
 
-
-
-
-
-
 </beans>
