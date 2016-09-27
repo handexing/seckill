@@ -35,7 +35,7 @@
 				      <td><fmt:formatDate value="${seckill.startTime}" pattern="yyyy-MM-dd HH:mm:ss"/></td>
 				      <td><fmt:formatDate value="${seckill.endTime}" pattern="yyyy-MM-dd HH:mm:ss"/></td>
 				      <td><fmt:formatDate value="${seckill.createTime}" pattern="yyyy-MM-dd HH:mm:ss"/></td>
-				      <td><a class="btn btn-info" href="/seckill/${seckill.seckillId}/detail" target="_blank">查看详情</a></td>
+				      <td><a class="btn btn-info" href="/seckill/seckill/${seckill.seckillId}/detail" target="_blank">查看详情</a></td>
 				    </tr>
 				  </c:forEach>
 				  </tbody>
@@ -47,10 +47,8 @@
 </body>
 
 <!-- jQuery文件。务必在bootstrap.min.js 之前引入 -->
-<script
-	src="http://cdn.static.runoob.com/libs/jquery/2.1.1/jquery.min.js"></script>
+<script src="http://cdn.static.runoob.com/libs/jquery/2.1.1/jquery.min.js"></script>
 <!-- 最新的 Bootstrap 核心 JavaScript 文件 -->
-<script
-	src="http://cdn.static.runoob.com/libs/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+<script src="http://cdn.static.runoob.com/libs/bootstrap/3.3.7/js/bootstrap.min.js"></script>
 
 </html>
