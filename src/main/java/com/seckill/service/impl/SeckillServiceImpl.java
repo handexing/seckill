@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.DigestUtils;
 
+import com.seckill.cache.RedisDao;
 import com.seckill.dao.SeckillDao;
 import com.seckill.dao.SuccessKilledDao;
 import com.seckill.dto.Exposer;
@@ -32,6 +33,8 @@ public class SeckillServiceImpl implements SeckillService {
 	
 	@Autowired
 	private SuccessKilledDao successKilledDao;
+	@Autowired
+	private RedisDao redisdao;
 
 	// 用户混淆md5
 	private final String slat = "sdshgjfg124332rtewrru#^$#%^*5uyhdfBHMLOIPI{";
@@ -45,6 +48,21 @@ public class SeckillServiceImpl implements SeckillService {
 	}
 
 	public Exposer exportSeckillUrl(long seckillId) {
+		//缓存优化
+		//1.访问redis
+		Seckill s = redisdao.getSeckill(seckillId);
+		if (s==null) {
+			//2.访问数据库
+			s = seckillDao.queryById(seckillId);
+			if (s==null) {
+				return new Exposer(false, seckillId);
+			}else{
+				//3.放入redis
+				redisdao.putSeckill(s);
+			}
+		}
+		
+		
 		Seckill seckill = seckillDao.queryById(seckillId);
 		if (seckill == null) {
 			return new Exposer(false, seckillId);
@@ -78,17 +96,17 @@ public class SeckillServiceImpl implements SeckillService {
 		Date killTime = new Date();
 
 		try {
-			// 减库存
-			int updateCount = seckillDao.reduceNumber(seckillId, killTime);
-			if (updateCount <= 0) {
-				// 没有更新记录,秒杀结束
-				throw new SeckillCloseException("秒杀结束");
+			// 记录秒杀数据
+			int insertCount = successKilledDao.insertSuccessKilled(seckillId, userPhone);
+			if (insertCount <= 0) {
+				// 重复秒杀，数据库ignore返回i
+				throw new RepeatKillException("重复秒杀");
 			} else {
-				// 记录秒杀数据
-				int insertCount = successKilledDao.insertSuccessKilled(seckillId, userPhone);
-				if (insertCount <= 0) {
-					// 重复秒杀，数据库ignore返回i
-					throw new RepeatKillException("重复秒杀");
+				// 减库存
+				int updateCount = seckillDao.reduceNumber(seckillId, killTime);
+				if (updateCount <= 0) {
+					// 没有更新记录,秒杀结束
+					throw new SeckillCloseException("秒杀结束");
 				} else {
 					// 秒杀成功
 					SuccessKilled successKilled = successKilledDao.queryByIdWithSecKill(seckillId, userPhone);
@@ -104,6 +122,12 @@ public class SeckillServiceImpl implements SeckillService {
 			// 所有编译异常，转换运行期异常
 			throw new SeckillException("seckill inner error:" + e.getMessage());
 		}
+	}
+
+	public SeckillExecution executeSeckillProcedure(long seckillId, long userPhone, String md5)
+			throws SeckillException, RepeatKillException, SeckillCloseException {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 }
